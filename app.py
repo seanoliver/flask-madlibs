@@ -1,8 +1,11 @@
+import sys
+print(sys.executable)
+
 from flask import Flask, render_template, request
 from flask_debugtoolbar import DebugToolbarExtension
 
 # from stories import silly_story as story
-from stories import silly_story, excited_story
+from stories import silly_story, excited_story, ai_story
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "secret"
@@ -12,6 +15,7 @@ debug = DebugToolbarExtension(app)
 stories = {
         "Silly Story" : silly_story,
         "Excited Story" : excited_story,
+        "AI-Generated Story" : ai_story,
     }
 
 @app.get('/')

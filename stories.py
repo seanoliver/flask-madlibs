@@ -1,4 +1,10 @@
-"""Madlibs Stories."""
+import os
+import re
+import openai
+from dotenv import load_dotenv
+
+load_dotenv()
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
 class Story:
@@ -35,6 +41,46 @@ class Story:
         return text
 
 
+def create_ai_story():
+
+    content = fetch_gpt_story()
+    terms = extract_terms(content)
+
+    return Story(terms, content)
+
+def fetch_gpt_story():
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system",
+             "content": """You are a helpful assistant that generates funny
+                        stories with blanked-out words indicated by curly
+                        braces. The blanked words should be mad-libs style
+                        descriptors of the type of word, such as noun,
+                        adjective, adverb, person name, place, country, action
+                        verb, etc.
+
+                        Please respond with the mad-libs story only without any
+                        chat-style conversation before or after the story
+                        content. In other words, don't feel a need to say things
+                        like: 'Sure thing! Here you go:' Instead, just respond
+                        with the desired story itself."""},
+            {"role": "user",
+             "content": """Create a funny story for me with mad-libs style blank
+                        words in curly braces."""}
+        ]
+    )
+
+    return response['choices'][0]['message']['content']
+
+def extract_terms(text):
+
+    pattern = r'\{([^}]+)\}'
+    terms = re.findall(pattern, text, flags=re.IGNORECASE)
+    return terms
+
+
 # Here's a story to get you started
 
 silly_story = Story(
@@ -50,3 +96,5 @@ excited_story = Story(
     ["noun", "verb"],
     """OMG!! OMG!! I love to {verb} a {noun}!"""
 )
+
+ai_story = create_ai_story()
